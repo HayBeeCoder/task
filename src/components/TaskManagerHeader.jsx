@@ -14,7 +14,7 @@ const tasks_count = useSelector(state => state?.tasks?.filteredTasks?.length)
       </p>
       <button
         className="task-manager__header-icon"
-        onClick={() => setShowModal(true)}
+        onClick={() => setShowModal(value => !value)}
       >
         <Plus />
       </button>

@@ -1,30 +1,24 @@
-// Body :    {
-//     assigned_user:  <id value from /team api response >,
-//     task_date: <date in 'YYYY-MM-DD' format from date field in task>,
-//     task_time: <time from time field in task>,seconds in integer format(for ex=01:30am means 5400 seconds) ,
-//     is_completed:<0 or 1 integer data type>,
-// time_zone:< Currenttimezone value in seconds and data type is integer>,(for ex= +05:30 means 19800 seconds),
-//     task_msg: <task description from task description field in task>
-//    }
 import { ReactComponent as Dropdown } from "../assets/dropdown.svg";
 import { ReactComponent as DateIcon } from "../assets/date.svg";
 import { ReactComponent as Time } from "../assets/time.svg";
 import { ReactComponent as Delete } from "../assets/delete.svg";
 
+import { useDispatch, useSelector } from "react-redux";
 import React from "react";
 import { useState } from "react";
+
 import { USERS } from "../constants/constants";
-import { useDispatch, useSelector } from "react-redux";
 import {
   useDeleteTaskMutation,
   usePostTasksMutation,
-  usePostTasksQuery,
   useUpdateTaskMutation,
 } from "../app/api";
-import { removeSelectedTaskId, taskUpdated } from "../features/task/TasksSlice";
+
+import { removeSelectedTaskId } from "../features/task/TasksSlice";
 
 const formatHourMinute = (hour_or_minute) =>
   hour_or_minute < 10 ? "0" + hour_or_minute : hour_or_minute;
+
 function convertSecondsToHoursMinutes(time_in_seconds) {
   const hour = Math.floor(time_in_seconds / 3600);
   const remaining_seconds = time_in_seconds % 3600;
@@ -34,37 +28,34 @@ function convertSecondsToHoursMinutes(time_in_seconds) {
 }
 
 const TaskManagerModal = ({ setShowModal }) => {
-  // const selectedTaskId = useSelector(state =>)
+  const dispatch = useDispatch();
+  const [save] = usePostTasksMutation();
+  const [remove] = useDeleteTaskMutation();
+  const [update] = useUpdateTaskMutation();
+
   const [selectedTaskId, selectedTask] = useSelector((state) => [
     state.tasks.selectedTaskId,
     state.tasks.tasks.find((task) => task.id === state.tasks.selectedTaskId),
   ]);
 
-  // console.log({selectedTaskId})
-
   const [description, setDescription] = useState(selectedTask?.task_msg || "");
+
   const [date, setDate] = useState(selectedTask?.task_date || null);
 
-  // console.log({ time: convertSecondsToHoursMinutes(selectedTask.task_time) });
   const [time, setTime] = useState(
     convertSecondsToHoursMinutes(selectedTask?.task_time || null)
   );
   const [assignedUser, setAssignedUser] = useState(
     selectedTask?.assigned_user || null
   );
-  const dispatch = useDispatch();
-  const [save] = usePostTasksMutation();
-  const [remove] = useDeleteTaskMutation();
-  const [update] = useUpdateTaskMutation()
 
   const handleDelete = async () => {
     try {
       const res = await remove(selectedTaskId);
-      console.log({ response_on_delete: res });
     } catch (e) {
       console.log(e);
     }
-    dispatch(removeSelectedTaskId())
+    dispatch(removeSelectedTaskId());
     setShowModal(false);
   };
 
@@ -78,8 +69,7 @@ const TaskManagerModal = ({ setShowModal }) => {
     if (name == "user") setAssignedUser(value);
   };
 
-  // console.log(new Date().getTimezoneOffset());
-  console.log({ description, date, time, assignedUser });
+  // console.log({ description, date, time, assignedUser });
 
   const disableSaveBtn = description == "" || !date || !time || !assignedUser;
 
@@ -88,39 +78,29 @@ const TaskManagerModal = ({ setShowModal }) => {
 
     const [h, m] = time.split(":");
     let value_in_seconds = parseInt(h) * 3600 + parseInt(m) * 60;
+    const payload = {
+      assigned_user: assignedUser,
+      task_date: date,
+      task_time: value_in_seconds,
+      is_completed: 0,
+      task_msg: description,
+      time_zone: Math.abs(time_zone),
+    };
+    try {
+      if (!selectedTaskId) {
+        const res = await save(payload).unwrap();
 
-    // if (h > 12) {
-    //   console.log("hallo");
-    //   value_in_seconds += 3600;
-    // }
-    // if(!selectedTaskId){
-      const payload = {
-        assigned_user: assignedUser,
-        task_date: date,
-        task_time: value_in_seconds,
-        is_completed: 0,
-        task_msg: description,
-        time_zone: Math.abs(time_zone),
-      }
-      try{
+        // console.log(res);
+      } else {
+        const res = await update({ task_id: selectedTaskId, patch: payload })
+          .unwrap;
 
-        
-        if(!selectedTaskId){
-          
-          const res = await save(payload).unwrap();
-        // }
-        
-        console.log(res);
-      }else{
-        const res = await update({task_id: selectedTaskId, patch: payload}).unwrap
-        
-        console.log({res_on_update: res})
+        // console.log({ res_on_update: res });
       }
-      
-    }catch(e){
-      console.log(e)
+    } catch (e) {
+      console.log(e);
     }
-      setShowModal(false)
+    setShowModal(false);
   };
 
   const handleModalClose = () => {
@@ -132,7 +112,6 @@ const TaskManagerModal = ({ setShowModal }) => {
 
   return (
     <div className="task-manager__modal">
-      {/* description  */}
       <div>
         <label htmlFor="description" className="label">
           Task Description
@@ -148,8 +127,6 @@ const TaskManagerModal = ({ setShowModal }) => {
           />
           <span className="task-input__icon"></span>
         </div>
-
-        {/* <label htmlFor="description" className="label">Task Description</label> */}
       </div>
 
       {/* date & time  */}

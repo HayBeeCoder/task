@@ -20,14 +20,12 @@ export const api = createApi({
         method: "GET",
       }),
       providesTags: ({results}, error, arg) =>{
-// console.log({results})
        return results
         ? [...results.map(({id}) => ({ type: 'Task', id })),
-        // { type: 'Task', id: 'LIST' }
+       
         "Task"
       ]
         :
-        // [  { type: 'Task', id: 'LIST' }]
         ["Task"]
       }
         
@@ -48,7 +46,6 @@ export const api = createApi({
           url: `${task_id}?company_id=${COMPANY_ID}`,
           method: "DELETE",
         }),
-        // invalidatesTags: [{ type: 'Task', id: 'LIST' }],
         invalidatesTags: (result, error, task_id) => [{ type: 'Task', id: task_id }],
     }),
     getTask: builder.mutation({
@@ -65,14 +62,9 @@ export const api = createApi({
         body: patch,
       }),
       invalidatesTags:['Task'],
-      // transformResponse: (rawResult) => rawRe,
       async onQueryStarted(uniqueIdentifier, { dispatch, queryFulfilled }) {
         dispatch(api.util.resetApiState())
-        // const { data }= await queryFulfilled;
-        // console.log({data})//
-        // console.log('lionnnnnnnnnnnnnnn')
-
-        // Update state with new data from response
+        
         const patchResult = dispatch(
           api.util.updateQueryData(
             'getTasks',
@@ -87,50 +79,12 @@ export const api = createApi({
             await queryFulfilled
           } catch {
             patchResult.undo()
-  
-            /**
-             * Alternatively, on failure you can invalidate the corresponding cache tags
-             * to trigger a re-fetch:
-             * dispatch(api.util.invalidateTags(['Post']))
-             */
+
           }
           
       },
-      // async onQueryStarted({ task_id, ...patch }, { dispatch, queryFulfilled }) {
-      //   const patchResult = dispatch(
-      //     api.util.updateQueryData('getTasks', task_id, (draft) => {
-      //       Object.assign(draft, patch)
-      //     })
-      //   )
-      //   try {
-      //     await queryFulfilled
-      //   } catch {
-      //     patchResult.undo()
-      //   }
-      // },  
     }),
 
-    // getProduct: builder.query({
-    //   query: (id) => ({
-    //     url: `product/${id}`,
-    //     method: "GET"
-
-    //   })
-    // }),
-    // updateCart: builder.mutation<{ data: ICartItem[] }, {id: string,body: {auth: {_id: string} ,data:{products: ICartItem[]}}}>({
-    //   query: ({id,body}) => ({
-
-    //     url: `cart/${id}`,
-    //     method: "PUT",
-    //     headers:{
-    //       "Access-Control-Allow-Origin":"*"
-    //     },
-    //     body
-    //   })
-    // }),
-    //     getCart: builder.query<{data: {_id:string,userId: string, products: ICartItem[]},error?:string} , string>({
-
-    //   }),
   }),
 });
 
