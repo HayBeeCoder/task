@@ -11,28 +11,32 @@ import { addTask, setFilteredTasks } from "./features/task/TasksSlice";
 import TasksList from "./features/task/TasksList";
 function App() {
   const dispatch = useDispatch();
-  const tasks = useSelector(state => state.tasks.tasks)
+  const tasks = useSelector((state) => state.tasks.tasks);
   const [showModal, setShowModal] = useState(false);
   const { data } = useGetTasksQuery();
-  // console.log({ data });
 
   useEffect(() => {
     if (data) {
-      console.log("yes, there is data now");
       dispatch(addTask(data?.results));
-      dispatch(setFilteredTasks(data?.results.filter((task,index,array) => {
-        return array.indexOf(task) == index
-      })))
+      dispatch(
+        setFilteredTasks(
+          data?.results.filter((task, index, array) => {
+            return array.indexOf(task) == index;
+          })
+        )
+      );
     }
   }, [data]);
-  
-  useEffect(() => {
-    dispatch(setFilteredTasks(data?.results.filter((task,index,array) => {
-      return array.indexOf(task) == index
-    })))
 
-  },[tasks])
-  // console.log({data})
+  useEffect(() => {
+    dispatch(
+      setFilteredTasks(
+        data?.results.filter((task, index, array) => {
+          return array.indexOf(task) == index;
+        })
+      )
+    );
+  }, [tasks])
 
   return (
     <div className="App">
@@ -40,22 +44,15 @@ function App() {
       <div className="main">
         <header className="header"></header>
         <main>
-          {/* <div className="relative"> */}
-            <div className="task-manager__container relative">
-              {/* top-section */}
-              <TaskManagerHeader setShowModal={setShowModal}>
-                {showModal && <TaskManagerModal setShowModal={setShowModal}/>}
-              </TaskManagerHeader>
-              <TasksList setShowModal={setShowModal}/>
-              {/* <TaskCard /> */}
-            </div>
-            {/* task-manager-body  */}
-            {/* Task description  */}
-          {/* </div> */}
+          <div className="task-manager__container relative">
+            <TaskManagerHeader setShowModal={setShowModal}>
+              {showModal && <TaskManagerModal setShowModal={setShowModal} />}
+            </TaskManagerHeader>
+            <TasksList setShowModal={setShowModal} />
+          </div>
         </main>
       </div>
     </div>
-    // </div>
   );
 }
 

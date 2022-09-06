@@ -7,7 +7,7 @@ const TasksList = ({ setShowModal }) => {
 
 
   return (
-    <>
+    <div className="task__list">
       {tasks &&
         tasks.map((task, id) => (
           <TaskCard
@@ -18,7 +18,7 @@ const TasksList = ({ setShowModal }) => {
             key={id}
           />
         ))}
-    </>
+    </div>
   );
 };
 

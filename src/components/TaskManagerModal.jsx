@@ -40,13 +40,13 @@ const TaskManagerModal = ({ setShowModal }) => {
 
   const [description, setDescription] = useState(selectedTask?.task_msg || "");
 
-  const [date, setDate] = useState(selectedTask?.task_date || null);
+  const [date, setDate] = useState(selectedTask?.task_date || '');
 
   const [time, setTime] = useState(
-    convertSecondsToHoursMinutes(selectedTask?.task_time || null)
+    convertSecondsToHoursMinutes(selectedTask?.task_time || '')
   );
   const [assignedUser, setAssignedUser] = useState(
-    selectedTask?.assigned_user || null
+    selectedTask?.assigned_user || ""
   );
 
   const handleDelete = async () => {
@@ -71,7 +71,7 @@ const TaskManagerModal = ({ setShowModal }) => {
 
   // console.log({ description, date, time, assignedUser });
 
-  const disableSaveBtn = description == "" || !date || !time || !assignedUser;
+  const disableSaveBtn = description == "" || date == "" || time == "" || assignedUser == "";
 
   const handleSave = async () => {
     let time_zone = new Date().getTimezoneOffset() * 60;
