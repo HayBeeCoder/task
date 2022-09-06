@@ -1,24 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
 
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import TaskManagerHeader from "./components/TaskManagerHeader";
+import TaskManagerModal from "./components/TaskManagerModal";
+import TaskCard from "./features/task/TaskCard";
+import { useGetTasksQuery } from "./app/api";
+import { addTask, setFilteredTasks } from "./features/task/TasksSlice";
+import TasksList from "./features/task/TasksList";
 function App() {
+  const dispatch = useDispatch();
+  const tasks = useSelector(state => state.tasks.tasks)
+  const [showModal, setShowModal] = useState(false);
+  const { data } = useGetTasksQuery();
+  // console.log({ data });
+
+  useEffect(() => {
+    if (data) {
+      console.log("yes, there is data now");
+      dispatch(addTask(data?.results));
+      dispatch(setFilteredTasks(data?.results.filter((task,index,array) => {
+        return array.indexOf(task) == index
+      })))
+    }
+  }, [data]);
+  
+  useEffect(() => {
+    dispatch(setFilteredTasks(data?.results.filter((task,index,array) => {
+      return array.indexOf(task) == index
+    })))
+
+  },[tasks])
+  // console.log({data})
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <aside className="sidebar"></aside>
+      <div className="main">
+        {/* <header className="header">counter : {count}</header> */}
+        <main>
+          {/* <div className="relative"> */}
+            <div className="task-manager__container relative">
+              {/* top-section */}
+              <TaskManagerHeader setShowModal={setShowModal}>
+                {showModal && <TaskManagerModal setShowModal={setShowModal}/>}
+              </TaskManagerHeader>
+              <TasksList setShowModal={setShowModal}/>
+              {/* <TaskCard /> */}
+            </div>
+            {/* task-manager-body  */}
+            {/* Task description  */}
+          {/* </div> */}
+        </main>
+      </div>
     </div>
+    // </div>
   );
 }
 
