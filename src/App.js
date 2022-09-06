@@ -38,7 +38,7 @@ function App() {
     <div className="App">
       <aside className="sidebar"></aside>
       <div className="main">
-        {/* <header className="header">counter : {count}</header> */}
+        <header className="header"></header>
         <main>
           {/* <div className="relative"> */}
             <div className="task-manager__container relative">
